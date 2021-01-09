@@ -9,6 +9,7 @@ class Location:
 
         self.max_cars: int = 20
         self._revenue_per_car: float = 10.0
+        self._park_penalty: float = 4.0
 
         self._demand_prob: np.ndarray = np.zeros(self.max_cars + 1, float)
         self._return_prob: np.ndarray = np.zeros(self.max_cars + 1, float)
@@ -59,3 +60,9 @@ class Location:
 
     def probability_transition(self, start_cars: int, end_cars: int) -> float:
         return self._prob_ending_cars[start_cars, end_cars]
+
+    def get_parking_penalty(self, end_cars: int) -> float:
+        if end_cars > 10:
+            return -self._park_penalty
+        else:
+            return 0.0

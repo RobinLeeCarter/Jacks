@@ -112,7 +112,12 @@ class Controller:
             probability_l1 = self.l1.probability_transition(start_cars=start_l1, end_cars=s_dash.cars_l1)
             probability_l2 = self.l2.probability_transition(start_cars=start_l2, end_cars=s_dash.cars_l2)
             s_dash_probability = probability_l1 * probability_l2
-            expected_future_reward = s_dash_probability * self.gamma * self.get_v(s_dash)
+
+            parking_penalty_l1 = self.l1.get_parking_penalty(s_dash.cars_l1)
+            parking_penalty_l2 = self.l1.get_parking_penalty(s_dash.cars_l2)
+            parking_penalty = parking_penalty_l1 + parking_penalty_l2
+
+            expected_future_reward = s_dash_probability * (parking_penalty + self.gamma * self.get_v(s_dash))
             return_ += expected_future_reward
         return return_
 
