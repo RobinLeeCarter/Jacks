@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List
 
 import numpy as np
 # import matplotlib.pyplot as plt
@@ -33,8 +33,15 @@ class Controller:
         self.policy: np.ndarray = np.zeros(shape=self.states_shape, dtype=int)
 
     def run(self):
-        self.policy_evaluation()
-        policy_stable = self.policy_improvement()
+        i: int = 0
+        policy_stable: bool = False
+        while not policy_stable:
+            if self.verbose:
+                print(f"Iteration {i}")
+                print(self.policy)
+            self.policy_evaluation()
+            policy_stable = self.policy_improvement()
+            i += 1
         if self.verbose:
             print(self.V)
 
@@ -74,7 +81,8 @@ class Controller:
             arg_max_a = [self.actions[i] for i in arg_max_i]
             if old_action not in arg_max_a:
                 policy_stable = False
-                self.set_policy(s, np.min(arg_max_a))
+                new_a = min(arg_max_a, key=abs)
+                self.set_policy(s, new_a)
         return policy_stable
 
     def get_expected_return(self, s: state.State, action: int) -> float:
