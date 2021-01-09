@@ -136,11 +136,19 @@ class Controller:
     def graph_policy(self, policy: np.ndarray, iteration):
         fig: figure.Figure = plt.figure()
         ax: figure.Axes = fig.subplots()
-        x = np.arange(self.states_shape[0])
-        y = np.arange(self.states_shape[1])
-        x_grid, y_grid = np.meshgrid(x, y)
-        contour_set = ax.contour(x_grid, y_grid, policy, levels=self.actions)
-        ax.clabel(contour_set, inline=True, fontsize=10)
+        # x = np.arange(self.states_shape[0])
+        # y = np.arange(self.states_shape[1])
+        # x_grid, y_grid = np.meshgrid(x, y)
+
+        # rows, cols = policy.shape
+        ax.imshow(policy, interpolation='nearest', origin='lower',
+                  vmin=-5, vmax=5, cmap='bwr')
+        # extent=[0.5, cols-0.5, 0.5, rows-0.5]
+        ax.set_xlim(xmin=0, xmax=20)
+        ax.set_ylim(ymin=0, ymax=20)
+
+        # contour_set = ax.contour(x_grid, y_grid, policy, levels=self.actions)
+        # ax.clabel(contour_set, inline=True, fontsize=10)
         ax.set_title(f'Policy {iteration}')
         plt.show()
 
