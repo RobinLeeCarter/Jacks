@@ -32,13 +32,15 @@ class Controller:
 
     def run(self):
         self.policy_evaluation()
-        print(self.V)
+        if self.verbose:
+            print(self.V)
 
     def policy_evaluation(self):
         cont: bool = True
         i: int = 0
 
-        print(f"Start policy evaluation")
+        if self.verbose:
+            print(f"Start policy evaluation")
         while cont:
             delta: float = 0.0
             for s in self.states:
@@ -65,7 +67,8 @@ class Controller:
                 self.set_v(s, return_)
                 diff = abs(v - return_)
                 delta = max(delta, diff)
-            print(f"policy_evaluation iteration = {i}\tdelta={delta:.2f}")
+            if self.verbose:
+                print(f"policy_evaluation iteration = {i}\tdelta={delta:.2f}")
             cont = not (delta < self.theta)
             i += 1
 
@@ -74,7 +77,6 @@ class Controller:
 
     def set_v(self, state_: state.State, value: float):
         self.V[state_.cars_l1, state_.cars_l2] = value
-        # print(f"V({state_.cars_l1}, {state_.cars_l2}) <- {value}")
 
     def get_action(self, state_: state.State) -> int:
         return self.policy[state_.cars_l1, state_.cars_l2]
