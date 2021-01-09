@@ -7,19 +7,19 @@ class Location:
         self._rental_rate: float = rental_rate
         self._return_rate: float = return_rate
 
-        self._max_cars: int = 20
+        self.max_cars: int = 20
         self._revenue_per_car: float = 10.0
 
-        self._demand_prob: np.ndarray = np.zeros(self._max_cars + 1, float)
-        self._return_prob: np.ndarray = np.zeros(self._max_cars + 1, float)
+        self._demand_prob: np.ndarray = np.zeros(self.max_cars + 1, float)
+        self._return_prob: np.ndarray = np.zeros(self.max_cars + 1, float)
 
         # given starting_cars as input, value is expected revenue
         # E[r[l] | s, a]
-        self._expected_revenue: np.ndarray = np.zeros(self._max_cars + 1, float)
+        self._expected_revenue: np.ndarray = np.zeros(self.max_cars + 1, float)
 
         # given starting_cars as first value, value is probability of ending_cars
         # Pr(s'[l] | s, a)
-        self._prob_ending_cars: np.ndarray = np.zeros(shape=(self._max_cars + 1, self._max_cars + 1), dtype=float)
+        self._prob_ending_cars: np.ndarray = np.zeros(shape=(self.max_cars + 1, self.max_cars + 1), dtype=float)
 
         self._build()
 
@@ -28,16 +28,16 @@ class Location:
         self._daily_outcome_tables()
 
     def _rental_return_prob(self):
-        car_count = [c for c in range(self._max_cars + 1)]
+        car_count = [c for c in range(self.max_cars + 1)]
         self._demand_prob = np.array([self._poisson(self._rental_rate, c) for c in car_count])
         self._return_prob = np.array([self._poisson(self._return_rate, c) for c in car_count])
         self._demand_prob[-1] += 1.0 - np.sum(self._demand_prob)
         self._return_prob[-1] += 1.0 - np.sum(self._return_prob)
 
     def _daily_outcome_tables(self):
-        self._prob_ending_cars = np.zeros(shape=(self._max_cars + 1, self._max_cars + 1), dtype=float)
+        self._prob_ending_cars = np.zeros(shape=(self.max_cars + 1, self.max_cars + 1), dtype=float)
 
-        for starting_cars in range(self._max_cars + 1):
+        for starting_cars in range(self.max_cars + 1):
             expected_revenue: float = 0.0
             for car_demand, demand_probability in enumerate(self._demand_prob):
                 cars_rented = min(starting_cars, car_demand)
