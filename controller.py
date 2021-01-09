@@ -15,6 +15,7 @@ class Controller:
 
         # hyperparameters
         self.theta = 0.1    # accuracy
+        self.standard: bool = False
 
         self.max_cars: int = 20
         self.max_transfer: int = 5
@@ -131,7 +132,10 @@ class Controller:
         return self.policy[state_.cars_l1, state_.cars_l2]
 
     def get_transfer_cost(self, action: int) -> float:
-        return abs(action) * self.cost_per_transfer
+        cost = abs(action) * self.cost_per_transfer
+        if not self.standard and action >= 1:
+            cost -= self.cost_per_transfer
+        return cost
 
     def graph_policy(self, policy: np.ndarray, iteration):
         fig: figure.Figure = plt.figure()
