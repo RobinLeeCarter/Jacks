@@ -1,8 +1,8 @@
 from typing import List
 
 import numpy as np
-# import matplotlib.pyplot as plt
-# from matplotlib import figure
+import matplotlib.pyplot as plt
+from matplotlib import figure, cm
 
 # import utils
 import state
@@ -31,19 +31,27 @@ class Controller:
 
         self.V: np.ndarray = np.zeros(shape=self.states_shape, dtype=float)
         self.policy: np.ndarray = np.zeros(shape=self.states_shape, dtype=int)
+        self.policies: List[np.ndarray] = []
 
     def run(self):
         i: int = 0
         policy_stable: bool = False
+
         while not policy_stable:
+            self.policies.append(self.policy.copy())
             if self.verbose:
                 print(f"Iteration {i}")
                 print(self.policy)
+            # self.graph_policy(self.policy, i)
             self.policy_evaluation()
             policy_stable = self.policy_improvement()
             i += 1
+
         if self.verbose:
             print(self.V)
+        for i, policy in enumerate(self.policies):
+            self.graph_policy(policy, i)
+        self.graph_v()
 
     def policy_evaluation(self):
         cont: bool = True
@@ -124,3 +132,27 @@ class Controller:
 
     def get_transfer_cost(self, action: int) -> float:
         return abs(action) * self.cost_per_transfer
+
+    def graph_policy(self, policy: np.ndarray, iteration):
+        fig: figure.Figure = plt.figure()
+        ax: figure.Axes = fig.subplots()
+        x = np.arange(self.states_shape[0])
+        y = np.arange(self.states_shape[1])
+        x_grid, y_grid = np.meshgrid(x, y)
+        contour_set = ax.contour(x_grid, y_grid, policy, levels=self.actions)
+        ax.clabel(contour_set, inline=True, fontsize=10)
+        ax.set_title(f'Policy {iteration}')
+        plt.show()
+
+    def graph_v(self):
+        fig: figure.Figure = plt.figure()
+        ax: figure.Axes = fig.add_subplot(111, projection='3d')
+        # ax: figure.Axes = fig.subplots(1, 1, 1, projection='3d')
+        x = np.arange(self.states_shape[0])
+        y = np.arange(self.states_shape[1])
+        x_grid, y_grid = np.meshgrid(x, y)
+        # noinspection PyUnresolvedReferences
+        ax.plot_surface(x_grid, y_grid, self.V, rstride=1, cstride=1, cmap=cm.coolwarm,
+                        linewidth=0, antialiased=False)
+        ax.set_zlim(400.0, 700.0)
+        plt.show()
